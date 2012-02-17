@@ -14,7 +14,7 @@ namespace WebApplication
     {
         protected void Page_Load(object sender, EventArgs e)
         {            
-            Parrot.Configure(new SortedList(){{"api_id","your_api_id"},{"api_key","yout_api_key"}});
+            Parrot.Configure(new SortedList(){{"api_id","your_api_id"},{"api_key","your_api_key"}});
             Parrot _parrot = new Parrot();
             _parrot.Send("test", "hellow world from .net");
         }
