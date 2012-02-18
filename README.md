@@ -19,7 +19,7 @@ namespace WebApplication
 
             Parrot _parrot = new Parrot();
 			// Send a message to the channel test
-            _parrot.Send("test", "hello world from .net");
+            string message_id = _parrot.Send("test", "hello world from .net");
         }
     }
 }

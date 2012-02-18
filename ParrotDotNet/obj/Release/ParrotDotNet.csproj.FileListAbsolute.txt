@@ -1,0 +1,5 @@
+C:\Users\tonyj\Desktop\Parrot\ParrotDotNet\obj\Release\ResolveAssemblyReference.cache
+C:\Users\tonyj\Desktop\Parrot\ParrotDotNet\bin\Release\ParrotDotNet.dll
+C:\Users\tonyj\Desktop\Parrot\ParrotDotNet\bin\Release\ParrotDotNet.pdb
+C:\Users\tonyj\Desktop\Parrot\ParrotDotNet\obj\Release\ParrotDotNet.dll
+C:\Users\tonyj\Desktop\Parrot\ParrotDotNet\obj\Release\ParrotDotNet.pdb

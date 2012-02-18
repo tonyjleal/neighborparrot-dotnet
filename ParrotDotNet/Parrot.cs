@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
@@ -34,18 +35,61 @@ namespace ParrotDotNet
         /// <param name="channel">channel name</param>
         /// <param name="message">message to send</param>
         /// <returns>Response from the server with error or message id if success</returns>
-        public void Send(String channel, String message)
+        public string  Send(String channel, String message)
         {
             string signed_data = sign_send_request(channel, message);
-            string url = server_host + "/send?" + signed_data;
-
-            using (var client = new WebClient())
-            {
-                client.Encoding = Encoding.UTF8;
-                string json = new JavaScriptSerializer().Serialize(message);
-                client.UploadString(url, json);
-            }
+            string url = server_host + "/send?";
+            return web_request_post(url, signed_data);
+            
         }
+
+
+        /// <summary>
+        /// Send post data using the WebRequest Class
+        /// </summary>
+        /// <param name="url">url full url</param>
+        /// <param name="signed_data">data to send</param>
+        /// <returns>Response from the server messae id if success</returns>
+        private string web_request_post(String url, String signed_data)
+        {
+            // Create a request using a URL that can receive a post. 
+            WebRequest request = WebRequest.Create(url);
+
+            // Create POST data and convert it to a byte array.
+            byte[] byteArray = Encoding.UTF8.GetBytes(signed_data);
+            // Set the Method property of the request to POST.
+            request.Method = "POST";
+            // Set the ContentType property of the WebRequest.
+            request.ContentType = "application/x-www-form-urlencoded";
+            // Set the ContentLength property of the WebRequest.
+            request.ContentLength = byteArray.Length;
+            // Get the request stream.
+            Stream dataStream = request.GetRequestStream();
+            // Write the data to the request stream.
+            dataStream.Write(byteArray, 0, byteArray.Length);
+            // Close the Stream object.
+            dataStream.Close();
+            // Get the response.
+            WebResponse response = request.GetResponse();
+            // Display the status.
+            string status = (((HttpWebResponse)response).StatusDescription);
+            // Get the stream containing content returned by the server.
+            dataStream = response.GetResponseStream();
+            // Open the stream using a StreamReader for easy access.
+            StreamReader reader = new StreamReader(dataStream);
+            // Read the content.
+            string responseFromServer = reader.ReadToEnd();
+            // Display the content.
+            string message_id = responseFromServer;
+            // Clean up the streams.
+            reader.Close();
+            dataStream.Close();
+            response.Close();
+
+            return message_id;
+        }
+
+
         /// <summary>
         /// Return signed data for send request
         /// </summary>
@@ -75,11 +119,12 @@ namespace ParrotDotNet
             data.Add("auth_timestamp", time.ToString());
             data.Add("auth_version", "1.0");
 
-            string str_to_sign = type + array_to_query(data);
+            string query = array_to_query(data);
+            string str_to_sign = type + query;
 
             var hmacsha256 = new HMACSHA256(Encoding.UTF8.GetBytes(Convert.ToString(options["api_key"])));
             var hash = hmacsha256.ComputeHash(Encoding.UTF8.GetBytes(Convert.ToString(str_to_sign)));
-            return array_to_query(data) + "&auth_signature=" + BytesToHex(hash);
+            return query + "&auth_signature=" + BytesToHex(hash);
         }
 
         private static string BytesToHex(IEnumerable<byte> byteArray)
